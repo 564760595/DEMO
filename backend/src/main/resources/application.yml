@@ -1,0 +1,163 @@
+server:
+  port: 9999
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 600000
+    keep-alive-timeout: 600000
+    max-keep-alive-requests: 100
+  servlet:
+    session:
+      timeout: 600000
+spring:
+  application:
+    name: "PigHealthSmartMedicine"
+    description: "面向生猪健康管理的智慧医药系统"
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/pig_health_smart_medicine?serverTimezone=Hongkong&useAffectedRows=true&characterEncoding=utf-8
+    username: root               #数据库用户名
+    password: 123456               #数据库密码
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5 # 初始化时创建的连接数
+    minIdle: 5 # 最小空闲连接数
+    maxActive: 20 # 最大活跃连接数
+    testWhileIdle: true # 是否在空闲时测试连接的有效性
+    validationQuery: SELECT 1 FROM DUAL # 验证连接的查询语句
+    timeBetweenEvictionRunsMillis: 60000 # 检查连接是否空闲的时间间隔
+    minEvictableIdleTimeMillis: 300000 # 连接在池中最小生存时间
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  # 邮件配置
+  mail:
+    username: 564760595@qq.com # qq邮箱
+    password: plkmctchkggqbedj # qq邮箱授权码
+    host: smtp.qq.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+    valid: 30
+    title: "面向生猪健康管理的智慧医药系统 - 用户认证"
+    template: "您的动态验证码为：<strong style='color: red'>%s</strong>，%d分钟内有效，若非本人操作，请勿泄露。"
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      timeout: 1800
+      database: 2
+      pool:
+        max-active: 200
+        max-idle: 10
+        max-wait: -1ms
+        min-idle: 0
+        #MongoDB连接配置
+    mongodb:
+      uri: mongodb://localhost:27017/chat_memory_db
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  #minio配置
+  minio:
+    access-key: minioadmin
+    secret-key: minioadmin
+    url: http://localhost:9005
+    bucket-name: pig-health
+
+knowledge:
+  storage:
+  # 可选：配置知识库存储根目录（绝对路径或相对运行目录）
+  # 不配置时默认使用项目路径 backend/src/main/resources/knowledge
+  # root: C:/Intellij_IDEA/Exploitation/DEV/PigHealthSmartMedicine/backend/src/main/resources/knowledge
+    root: E:/PigHealthSmartMedicine-master/backend/src/main/resources/knowledge
+
+# mybatis-plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+  # sa-token配置
+  sa-token:
+    # token名称 (同时也是cookie名称)
+    token-name: satoken
+    # token有效期，单位s 默认30天, -1代表永不过期
+    timeout: 2592000
+    # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+    activity-timeout: -1
+    # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+    allow-concurrent-login: true
+    # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+    is-share: false
+    # token风格
+    token-style: uuid
+
+# 日志配置
+logging:
+  level:
+    world.world.xuewei.dao.mapper: debug
+# springdoc-openapi项目配置
+springdoc:
+  version: 1.0.0
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: "default"
+      paths-to-match: "/**"
+      packages-to-scan: com.linyi.pig.controller
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  api:
+    title: "面向生猪健康管理的智慧医药系统 API 文档"
+    description: "这是一个用于面向生猪健康管理的智慧医药系统API文档"
+    version: 1.0.0
+    contact:
+      name: linyi
+      email: jingshuihuayue@qq.com
+    license:
+      name: MIT
+      url: https://github.com/linyshdhhcb/PigHealthSmartMedicine/blob/master/LICENSE
+  setting:
+    language: zh_cn
+
+# 配置ai
+ai:
+  ollama:
+    url: http://127.0.0.1:11434 #这里是我本地部署的ollama默认地址（需要根据你自己的更换）
+    chat:
+      options:
+        model: qwen2:7b # 模型名称 本地ollama 下载的模型名称（需要根据你自己的更换）
+    embedding:
+      options:
+        model: nomic-embed-text # 模型名称 本地ollama 下载的模型名称（需要根据你自己的更换）
+
+langchain4j:
+  community:
+    dashscope:
+      embedding-model:
+        api-key: ${A_LI_API_KEY}
+        model-name: text-embedding-v3
+      #集成阿里通义千问 - 流式输出
+      streaming-chat-model:
+        api-key: ${A_LI_API_KEY}
+        model-name: qwen-plus
